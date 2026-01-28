@@ -758,7 +758,7 @@ export default async function decorate(block) {
   const chartTitle = document.createElement('div');
   chartTitle.className = 'co-innovation-chart-title';
   chartTitle.innerHTML = `
-    <h2>Co-Innovation Journey</h2>
+    <h1>Co-Innovation Journey</h1>
     <p class="subtitle">8-Step Process from Discovery to Delivery</p>
   `;
 
