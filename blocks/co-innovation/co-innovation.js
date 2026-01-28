@@ -346,6 +346,45 @@ function createFlowchart(container, onNodeClick) {
 }
 
 /**
+ * Create mobile-friendly list view of process steps
+ * @param {Element} container - The container element
+ * @param {Function} onStepClick - Callback when step is clicked
+ */
+function createMobileList(container, onStepClick) {
+  const counts = getProjectCounts();
+
+  const list = document.createElement('div');
+  list.className = 'co-innovation-mobile-list';
+
+  coInnovationProcess.forEach((step, index) => {
+    const count = counts[step.id] || 0;
+
+    const stepEl = document.createElement('div');
+    stepEl.className = `mobile-step ${step.type}`;
+    stepEl.innerHTML = `
+      <div class="mobile-step-number">${index + 1}</div>
+      <div class="mobile-step-content">
+        <div class="mobile-step-header">
+          <h3 class="mobile-step-title">${step.title}</h3>
+          <span class="mobile-step-badge">${step.type}</span>
+        </div>
+        <p class="mobile-step-desc">${step.description}</p>
+        <div class="mobile-step-meta">
+          ${count > 0 ? `<span class="mobile-step-count"><strong>${count}</strong> project${count !== 1 ? 's' : ''}</span>` : ''}
+          ${step.duration ? `<span class="mobile-step-count">${step.duration}</span>` : ''}
+        </div>
+      </div>
+      <span class="mobile-step-arrow">→</span>
+    `;
+
+    stepEl.addEventListener('click', () => onStepClick(step));
+    list.append(stepEl);
+  });
+
+  container.append(list);
+}
+
+/**
  * Create the detail panel
  * @param {Element} block - The block element
  * @returns {Object} Panel elements and methods
@@ -624,8 +663,11 @@ export default async function decorate(block) {
     }
   });
 
-  // Create the flowchart
+  // Create the flowchart (desktop)
   createFlowchart(chartWrapper, handleNodeClick);
+
+  // Create mobile list view
+  createMobileList(chartContainer, handleNodeClick);
 
   // Handle resize
   let resizeTimeout;
