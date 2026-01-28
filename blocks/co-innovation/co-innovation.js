@@ -102,6 +102,90 @@ function getStepById(stepId) {
 }
 
 /**
+ * Escape CSV value (handle commas, quotes, newlines)
+ * @param {*} value - Value to escape
+ * @returns {string} Escaped value
+ */
+function escapeCSV(value) {
+  if (value === null || value === undefined) return '';
+  const str = String(value);
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+/**
+ * Generate CSV content for projects
+ * @returns {string} CSV content
+ */
+function generateProjectsCSV() {
+  const headers = ['ID', 'Name', 'Current Stage', 'Stage Title', 'Status', 'Progress %', 'Next Steps', 'Blocking Reason'];
+
+  const rows = projects.map((project) => {
+    const stage = getStepById(project.currentStage);
+    return [
+      escapeCSV(project.id),
+      escapeCSV(project.name),
+      escapeCSV(project.currentStage),
+      escapeCSV(stage ? stage.title : ''),
+      escapeCSV(project.status),
+      escapeCSV(project.progress),
+      escapeCSV(project.nextSteps),
+      escapeCSV(project.blockingReason || ''),
+    ].join(',');
+  });
+
+  return [headers.join(','), ...rows].join('\n');
+}
+
+/**
+ * Generate CSV content for process steps
+ * @returns {string} CSV content
+ */
+function generateProcessCSV() {
+  const headers = ['Step #', 'ID', 'Title', 'Type', 'Description', 'Details', 'Duration', 'Owner', 'Inputs', 'Outputs', 'Criteria', 'Outcomes', 'Project Count'];
+
+  const counts = getProjectCounts();
+
+  const rows = coInnovationProcess.map((step, index) => [
+    escapeCSV(index + 1),
+    escapeCSV(step.id),
+    escapeCSV(step.title),
+    escapeCSV(step.type),
+    escapeCSV(step.description),
+    escapeCSV(step.details),
+    escapeCSV(step.duration || ''),
+    escapeCSV(step.owner || ''),
+    escapeCSV(step.inputs?.join('; ') || ''),
+    escapeCSV(step.outputs?.join('; ') || ''),
+    escapeCSV(step.criteria?.join('; ') || ''),
+    escapeCSV(step.outcomes?.join('; ') || ''),
+    escapeCSV(counts[step.id] || 0),
+  ].join(','));
+
+  return [headers.join(','), ...rows].join('\n');
+}
+
+/**
+ * Trigger CSV file download
+ * @param {string} content - CSV content
+ * @param {string} filename - Filename for download
+ */
+function downloadCSV(content, filename) {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
  * Create the flowchart visualization using D3.js
  * @param {Element} container - The container element
  * @param {Function} onNodeClick - Callback when node is clicked
@@ -612,9 +696,61 @@ export default async function decorate(block) {
   const header = document.createElement('div');
   header.className = 'co-innovation-header';
   header.innerHTML = `
-    <h1>AEM Co-Innovation Process</h1>
-    <p>From Idea to Impact</p>
+    <div class="co-innovation-header-content">
+      <h1>AEM Co-Innovation Process</h1>
+      <p>From Idea to Impact</p>
+    </div>
+    <div class="co-innovation-header-actions">
+      <div class="co-innovation-download-dropdown">
+        <button class="co-innovation-download-btn" aria-expanded="false" aria-haspopup="true">
+          <span class="download-icon">↓</span>
+          <span class="download-text">Export CSV</span>
+        </button>
+        <div class="co-innovation-download-menu" hidden>
+          <button class="download-option" data-type="projects">Download Projects</button>
+          <button class="download-option" data-type="process">Download Process Steps</button>
+          <button class="download-option" data-type="all">Download All Data</button>
+        </div>
+      </div>
+    </div>
   `;
+
+  // Setup download functionality
+  const downloadBtn = header.querySelector('.co-innovation-download-btn');
+  const downloadMenu = header.querySelector('.co-innovation-download-menu');
+  const downloadOptions = header.querySelectorAll('.download-option');
+
+  downloadBtn.addEventListener('click', () => {
+    const isExpanded = downloadBtn.getAttribute('aria-expanded') === 'true';
+    downloadBtn.setAttribute('aria-expanded', !isExpanded);
+    downloadMenu.hidden = isExpanded;
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!header.querySelector('.co-innovation-download-dropdown').contains(e.target)) {
+      downloadBtn.setAttribute('aria-expanded', 'false');
+      downloadMenu.hidden = true;
+    }
+  });
+
+  downloadOptions.forEach((option) => {
+    option.addEventListener('click', () => {
+      const { type } = option.dataset;
+      const timestamp = new Date().toISOString().split('T')[0];
+
+      if (type === 'projects' || type === 'all') {
+        downloadCSV(generateProjectsCSV(), `co-innovation-projects-${timestamp}.csv`);
+      }
+      if (type === 'process' || type === 'all') {
+        downloadCSV(generateProcessCSV(), `co-innovation-process-${timestamp}.csv`);
+      }
+
+      // Close dropdown
+      downloadBtn.setAttribute('aria-expanded', 'false');
+      downloadMenu.hidden = true;
+    });
+  });
 
   const chartContainer = document.createElement('div');
   chartContainer.className = 'co-innovation-chart-container';
