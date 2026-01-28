@@ -7,8 +7,8 @@ const isDesktop = window.matchMedia('(min-width: 900px)');
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
     const nav = document.getElementById('nav');
-    const navSections = nav.querySelector('.nav-sections');
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+    const navSections = nav?.querySelector('.nav-sections');
+    const navSectionExpanded = navSections?.querySelector('[aria-expanded="true"]');
     if (navSectionExpanded && isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleAllNavSections(navSections);
@@ -16,7 +16,7 @@ function closeOnEscape(e) {
     } else if (!isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleMenu(nav, navSections);
-      nav.querySelector('button').focus();
+      nav.querySelector('button')?.focus();
     }
   }
 }
@@ -25,7 +25,7 @@ function closeOnFocusLost(e) {
   const nav = e.currentTarget;
   if (!nav.contains(e.relatedTarget)) {
     const navSections = nav.querySelector('.nav-sections');
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+    const navSectionExpanded = navSections?.querySelector('[aria-expanded="true"]');
     if (navSectionExpanded && isDesktop.matches) {
       // eslint-disable-next-line no-use-before-define
       toggleAllNavSections(navSections, false);
@@ -57,6 +57,7 @@ function focusNavSection() {
  * @param {Boolean} expanded Whether the element should be expanded or collapsed
  */
 function toggleAllNavSections(sections, expanded = false) {
+  if (!sections) return;
   sections.querySelectorAll('.nav-sections .default-content-wrapper > ul > li').forEach((section) => {
     section.setAttribute('aria-expanded', expanded);
   });
@@ -74,21 +75,26 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   document.body.style.overflowY = (expanded || isDesktop.matches) ? '' : 'hidden';
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
   toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
-  button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
-  // enable nav dropdown keyboard accessibility
-  const navDrops = navSections.querySelectorAll('.nav-drop');
-  if (isDesktop.matches) {
-    navDrops.forEach((drop) => {
-      if (!drop.hasAttribute('tabindex')) {
-        drop.setAttribute('tabindex', 0);
-        drop.addEventListener('focus', focusNavSection);
-      }
-    });
-  } else {
-    navDrops.forEach((drop) => {
-      drop.removeAttribute('tabindex');
-      drop.removeEventListener('focus', focusNavSection);
-    });
+  if (button) {
+    button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+  }
+
+  // enable nav dropdown keyboard accessibility (only if navSections exists)
+  if (navSections) {
+    const navDrops = navSections.querySelectorAll('.nav-drop');
+    if (isDesktop.matches) {
+      navDrops.forEach((drop) => {
+        if (!drop.hasAttribute('tabindex')) {
+          drop.setAttribute('tabindex', 0);
+          drop.addEventListener('focus', focusNavSection);
+        }
+      });
+    } else {
+      navDrops.forEach((drop) => {
+        drop.removeAttribute('tabindex');
+        drop.removeEventListener('focus', focusNavSection);
+      });
+    }
   }
 
   // enable menu collapse on escape keypress
@@ -126,10 +132,12 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  if (navBrand) {
+    const brandLink = navBrand.querySelector('.button');
+    if (brandLink) {
+      brandLink.className = '';
+      brandLink.closest('.button-container').className = '';
+    }
   }
 
   const navSections = nav.querySelector('.nav-sections');

@@ -1,0 +1,31 @@
+id,name,currentStage,status,nextSteps,blockingReason,progress
+proj-001,AI Content Recommendations,ideation,on-track,Complete customer research and document problem statement,,25
+proj-002,Smart Asset Tagging,ideation,on-track,Gather requirements from content team,,40
+proj-003,Multi-Language Workflow,ideation,blocked,Define scope and technical approach,Waiting for stakeholder alignment on requirements,15
+proj-004,Advanced Analytics Dashboard,initial-review,on-track,Complete feasibility assessment,,55
+proj-005,Automated Testing Framework,initial-review,on-track,Review technical requirements,,60
+proj-006,Content Versioning System,initial-review,blocked,Clarify resource requirements,Need confirmation on engineering capacity,45
+proj-007,Performance Optimization Suite,deep-dive,on-track,Complete technical architecture proposal,,70
+proj-008,Mobile App Integration,deep-dive,on-track,Develop business case with ROI projections,,65
+proj-009,Real-time Collaboration Tools,deep-dive,on-track,Finalize stakeholder identification,,72
+proj-010,Cloud Migration Strategy,deep-dive,blocked,Complete infrastructure assessment,Waiting for infrastructure team availability,50
+proj-011,Customer Portal Enhancement,deep-dive,on-track,Create technical design document,,68
+proj-012,API Rate Limiting,deep-dive,blocked,Review security requirements,Security team review pending,55
+proj-013,Data Export Tools,approval-gate,on-track,Present business case to executive leadership,,80
+proj-014,Workflow Automation,approval-gate,on-track,Schedule executive review meeting,,78
+proj-015,Advanced Search Features,approval-gate,blocked,Address resource commitment questions,Executive concerns about resource allocation,75
+proj-016,User Permission System,roadmap,on-track,Define milestones and dependencies,,85
+proj-017,Notification Center,roadmap,on-track,Assign team members to project,,88
+proj-018,Template Library Expansion,roadmap,blocked,Finalize timeline with stakeholders,Conflicting priorities in Q2 roadmap,82
+proj-019,Video Processing Pipeline,implementation,on-track,Complete sprint planning for next iteration,,45
+proj-020,GraphQL API Layer,implementation,on-track,Conduct code review for authentication module,,62
+proj-021,Batch Processing System,implementation,on-track,Run integration tests,,78
+proj-022,Custom Form Builder,implementation,blocked,Resolve dependency conflicts,Third-party library compatibility issues,35
+proj-023,Audit Logging System,implementation,on-track,Prepare demo for stakeholders,,85
+proj-024,Content Preview System,implementation,on-track,Complete unit test coverage,,72
+proj-025,Email Integration,release,on-track,Deploy to staging environment,,92
+proj-026,SSO Integration,release,on-track,Prepare release notes and documentation,,95
+proj-027,Backup & Recovery Tools,release,blocked,Fix critical bug in production deployment,Deployment pipeline failure,88
+proj-028,Usage Analytics Dashboard,measurement,on-track,Collect initial usage metrics,,100
+proj-029,Customer Feedback Portal,measurement,on-track,Analyze adoption patterns,,100
+proj-030,Performance Monitoring,measurement,on-track,Generate quarterly adoption report,,100
